@@ -1,0 +1,9 @@
+streamlit
+streamlit-chat
+pypdf
+langchain
+BeautifulSoup4
+chromadb
+google-cloud-aiplatform
+PyCryptodome
+
