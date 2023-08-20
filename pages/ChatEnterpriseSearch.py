@@ -14,7 +14,10 @@ REGION = "us-central1"
 SEARCH_ENGINE_ID = "<search_engine_id>"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
-st.title("Chat Enterprise Search")
+st.title("Chat with Enterprise Search")
+st.write("Enterprise Search に登録済みの文書で検索できます。")
+st.write("ここでは ChatPDF と同じ文書が登録されいます。")
+
 if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
 
@@ -23,9 +26,9 @@ if "esmessages" not in st.session_state:
     # Enterprise Search retriever
     retriever = GoogleCloudEnterpriseSearchRetriever(project_id=PROJECT_ID, search_engine_id=SEARCH_ENGINE_ID, get_extractive_answers=False)
     # Create chain to answer questions
-    #st.session_state.rqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    st.session_state.esqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
+    st.session_state.esqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
+    #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    #st.session_state.esqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
 
 # Display chat messages from history on app rerun
 for esmessages in st.session_state.esmessages:
@@ -33,25 +36,24 @@ for esmessages in st.session_state.esmessages:
         st.markdown(esmessages["content"])
 
 # Accept user input
-if prompt := st.chat_input("Ask something here"):
+if prompt := st.chat_input("日本語変換の確定でサブミットされるため、質問はペーストしてください。"):
     # Display user message in chat message container
     with st.chat_message("user"):
         st.markdown(prompt)
 
     # RetrievalQA
     esqa = st.session_state.esqa
-    response = esqa({"question": prompt}) #use "query" for RetrievalQA
+    response = esqa({"query": prompt}) #"query" for RetrievalQA "question" for ConversationalRetrievalChain
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        #st.markdown(response["answer"]) #use "result" for RetrievalQA
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in response["answer"].split():
+        for chunk in response["result"].split(): #"result" for RetrievalQA "answer" for ConversationalRetrievalChain
             full_response += chunk + " "
-            time.sleep(0.05)
+            time.sleep(0.1)
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     # Add message to chat history
     st.session_state.esmessages.append({"role": "user", "content": prompt})
-    st.session_state.esmessages.append({"role": "assistant", "content": response["answer"]})
+    st.session_state.esmessages.append({"role": "assistant", "content": response["result"]})
