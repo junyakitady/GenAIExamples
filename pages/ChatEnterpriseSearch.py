@@ -15,8 +15,8 @@ SEARCH_ENGINE_ID = "<search_engine_id>"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("Chat with Enterprise Search")
-st.write("Enterprise Search に登録済みの文書で検索できます。")
-st.write("ここでは ChatPDF と同じ文書が登録されいます。")
+st.write("Enterprise Search に登録済みの文書でチャットできます。")
+st.write("ここでは ChatPDF と同じサンプルが登録されています。")
 
 if "esmessages" not in st.session_state:
     st.session_state.esmessages = []

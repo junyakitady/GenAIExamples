@@ -31,8 +31,3 @@ Cloud Console の Cloud Run のサービス作成 UI を利用する場合、
 - セキュリティのサービスアカウントに、`Vertex AI ユーザー`権限を保持するサービスアカウントを指定
 
 を各自の環境用に指定すれば自動でデプロイ、動作します。
-
-
-## 参考情報
-- [Getting Started with LangChain 🦜️🔗 + Vertex AI PaLM API](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/language/examples/langchain-intro/intro_langchain_palm_api.ipynb)
-- [Question Answering with Large Documents using LangChain 🦜🔗](https://github.com/GoogleCloudPlatform/generative-ai/blob/main/language/examples/document-qa/question_answering_large_documents_langchain.ipynb)

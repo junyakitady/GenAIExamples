@@ -6,4 +6,3 @@ chromadb
 google-cloud-aiplatform
 google-cloud-discoveryengine
 PyCryptodome
-tensorflow_text
