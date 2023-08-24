@@ -15,8 +15,9 @@ SEARCH_ENGINE_ID = "<search_engine_id>"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("Chat with Enterprise Search")
-st.write("Enterprise Search に登録済みの文書でチャットできます。")
-st.write("ここでは ChatPDF と同じサンプルが登録されています。")
+st.text("Enterprise Search に登録済みの文書でチャットできます。ChatPDFのサンプルと同じPDFが登録されています。")
+with st.sidebar:
+    st.components.v1.iframe("https://storage.googleapis.com/public4llm/es/index.html", height=650)
 
 if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
