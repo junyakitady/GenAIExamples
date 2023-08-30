@@ -1,8 +1,7 @@
 import time
 import streamlit as st
 import langchain
-from langchain.chains import RetrievalQA
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.llms import VertexAI
 from langchain.retrievers import GoogleCloudEnterpriseSearchRetriever

@@ -2,8 +2,7 @@ import tempfile, os, time
 import streamlit as st
 import langchain
 from langchain.document_loaders import PyPDFLoader
-from langchain.chains import RetrievalQA
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.llms import VertexAI
 from langchain.embeddings import VertexAIEmbeddings
@@ -36,7 +35,7 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # load PDF file
                 documents = PyPDFLoader(temp_pdf.name).load()
                 # Embeddings API integrated with LangChain
-                embedding = VertexAIEmbeddings()
+                embedding = VertexAIEmbeddings(model_name="textembedding-gecko-multilingual")
                 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
                 content = "\n\n".join(doc.page_content for doc in documents)
                 texts=text_splitter.split_text(content)
