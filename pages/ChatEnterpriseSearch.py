@@ -10,7 +10,7 @@ import vertexai
 # init Vertex AI
 PROJECT_ID = "<your_project_id>"
 REGION = "us-central1"
-SEARCH_ENGINE_ID = "<search_engine_id>"
+DATASTORE_ID = "<datastore_id>"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("Chat with Enterprise Search")
@@ -24,7 +24,7 @@ if "esmessages" not in st.session_state:
     # Text model instance integrated with LangChain
     llm = VertexAI(model_name="text-bison@001", max_output_tokens=256, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
     # Enterprise Search retriever
-    retriever = GoogleCloudEnterpriseSearchRetriever(project_id=PROJECT_ID, search_engine_id=SEARCH_ENGINE_ID, get_extractive_answers=False)
+    retriever = GoogleCloudEnterpriseSearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID, get_extractive_answers=False)
     # Create chain to answer questions
     st.session_state.esqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
     #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
