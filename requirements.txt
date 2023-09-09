@@ -1,6 +1,6 @@
 streamlit
 pypdf
-langchain==0.0.236
+langchain
 BeautifulSoup4
 chromadb
 google-cloud-aiplatform
