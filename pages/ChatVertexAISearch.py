@@ -4,7 +4,7 @@ import langchain
 from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain.llms import VertexAI
-from langchain.retrievers import GoogleCloudEnterpriseSearchRetriever
+from langchain.retrievers import GoogleVertexAISearchRetriever
 import vertexai
 
 # init Vertex AI
@@ -13,8 +13,8 @@ REGION = "us-central1"
 DATASTORE_ID = "<datastore_id>"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
-st.title("Chat with Enterprise Search")
-st.text("Enterprise Search に登録済みの文書でチャットできます。ChatPDFのサンプルと同じPDFが登録されています。")
+st.title("Chat with Vertex AI Search")
+st.text("Vertex AI Search に登録済みの文書でチャットできます。ChatPDFのサンプルと同じPDFが登録されています。")
 with st.sidebar:
     st.components.v1.iframe("https://storage.googleapis.com/public4llm/es/index.html", height=650)
 
@@ -23,8 +23,8 @@ if "esmessages" not in st.session_state:
 
     # Text model instance integrated with LangChain
     llm = VertexAI(model_name="text-bison@001", max_output_tokens=256, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
-    # Enterprise Search retriever
-    retriever = GoogleCloudEnterpriseSearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID, get_extractive_answers=False)
+    # Vertex AI Search retriever
+    retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID, get_extractive_answers=False)
     # Create chain to answer questions
     st.session_state.esqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
     #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
