@@ -24,11 +24,12 @@ if "esmessages" not in st.session_state:
     # Text model instance integrated with LangChain
     llm = VertexAI(model_name="text-bison@001", max_output_tokens=256, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
     # Vertex AI Search retriever
-    retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID, get_extractive_answers=False)
+    retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID,
+                                              get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)
     # Create chain to answer questions
     st.session_state.esqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-    #memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    #st.session_state.esqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
+    # memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    # st.session_state.esqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
 
 # Display chat messages from history on app rerun
 for esmessages in st.session_state.esmessages:
@@ -43,13 +44,13 @@ if prompt := st.chat_input("日本語変換の確定でサブミットされる�
 
     # RetrievalQA
     esqa = st.session_state.esqa
-    response = esqa({"query": prompt}) #"query" for RetrievalQA "question" for ConversationalRetrievalChain
+    response = esqa({"query": prompt})  # "query" for RetrievalQA "question" for ConversationalRetrievalChain
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in response["result"].split(): #"result" for RetrievalQA "answer" for ConversationalRetrievalChain
+        for chunk in response["result"].split():  # "result" for RetrievalQA "answer" for ConversationalRetrievalChain
             full_response += chunk + " "
             time.sleep(0.1)
             message_placeholder.markdown(full_response + "▌")
