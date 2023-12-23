@@ -1,4 +1,3 @@
-import time
 import streamlit as st
 import langchain
 from langchain.chains import RetrievalQA, ConversationalRetrievalChain
@@ -22,7 +21,7 @@ if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
 
     # Text model instance integrated with LangChain
-    llm = VertexAI(model_name="text-bison@001", max_output_tokens=256, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
+    llm = VertexAI(model_name="text-bison", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
     # Vertex AI Search retriever
     retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID,
                                               get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)
@@ -48,13 +47,8 @@ if prompt := st.chat_input("日本語変換の確定でサブミットされる�
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in response["result"].split():  # "result" for RetrievalQA "answer" for ConversationalRetrievalChain
-            full_response += chunk + " "
-            time.sleep(0.1)
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
+        st.markdown(response["result"])  # "result" for RetrievalQA "answer" for ConversationalRetrievalChain
+
     # Add message to chat history
     st.session_state.esmessages.append({"role": "user", "content": prompt})
     st.session_state.esmessages.append({"role": "assistant", "content": response["result"]})
