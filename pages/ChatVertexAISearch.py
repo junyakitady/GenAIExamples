@@ -1,7 +1,9 @@
+from operator import itemgetter
 import streamlit as st
 import langchain
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 from langchain.llms import VertexAI
 from langchain.retrievers import GoogleVertexAISearchRetriever
 import vertexai
@@ -21,14 +23,18 @@ if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
 
     # Text model instance integrated with LangChain
-    llm = VertexAI(model_name="text-bison", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
+    llm = VertexAI(model_name="text-bison", max_output_tokens=512, temperature=0.1, top_k=40, top_p=0.8, verbose=True)
     # Vertex AI Search retriever
     retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, search_engine_id=DATASTORE_ID,
                                               get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)
     # Create chain to answer questions
-    st.session_state.esqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-    # memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    # st.session_state.esqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
+    template = """次のコンテキスト情報をもとに、最後の質問に答えてください。
+もしコンテキスト情報の中に回答に十分な情報がない場合は、十分な情報がないため分かりません、と答えてください。:
+Context: {context}
+
+Question: {question}"""
+    prompt = PromptTemplate.from_template(template)
+    st.session_state.esqa = {"context": retriever, "question": RunnablePassthrough()} | prompt | llm | StrOutputParser()
 
 # Display chat messages from history on app rerun
 for esmessages in st.session_state.esmessages:
@@ -36,19 +42,19 @@ for esmessages in st.session_state.esmessages:
         st.markdown(esmessages["content"])
 
 # Accept user input
-if prompt := st.chat_input("日本語変換の確定でサブミットされるため、質問はペーストしてください。"):
+if query := st.chat_input("日本語変換の確定でサブミットされるため、質問はペーストしてください。"):
     # Display user message in chat message container
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(query)
 
     # RetrievalQA
     esqa = st.session_state.esqa
-    response = esqa({"query": prompt})  # "query" for RetrievalQA "question" for ConversationalRetrievalChain
+    response = esqa.invoke(query)
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        st.markdown(response["result"])  # "result" for RetrievalQA "answer" for ConversationalRetrievalChain
+        st.markdown(response)
 
     # Add message to chat history
-    st.session_state.esmessages.append({"role": "user", "content": prompt})
-    st.session_state.esmessages.append({"role": "assistant", "content": response["result"]})
+    st.session_state.esmessages.append({"role": "user", "content": query})
+    st.session_state.esmessages.append({"role": "assistant", "content": response})

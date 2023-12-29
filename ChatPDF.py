@@ -3,8 +3,9 @@ import os
 import streamlit as st
 import langchain
 from langchain.document_loaders import PyPDFLoader
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 from langchain.llms import VertexAI
 from langchain.embeddings import VertexAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -20,11 +21,6 @@ st.title("PDF の内容で回答する Chatbot")
 
 if "rqa" not in st.session_state:
     st.session_state.messages = []
-    st.write("""
-         - [Alphabet 2022 10K annual report](https://abc.xyz/assets/9a/bd/838c917c4b4ab21f94e84c3c2c65/goog-10-k-q4-2022.pdf)
-         - [Google Cloud セキュリティ ホワイトペーパー](https://services.google.com/fh/files/misc/security_whitepapers_4_booklet_jp.pdf)
-         - [「Google Cloud Day: Digital '22 - 15 のトピックから学ぶ」🌟eBook](https://lp.cloudplatformonline.com/rs/808-GJW-314/images/Google_ebooks_all_0614.pdf)
-        """)
 
 # PDF load and embedding
 uploaded_file = st.file_uploader("PDF ファイルをアップロードしてください。", type=["pdf"],)
@@ -47,9 +43,14 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # Text model instance integrated with LangChain
                 llm = VertexAI(model_name="text-bison", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
                 # Create chain to answer questions
-                st.session_state.rqa = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=retriever, return_source_documents=True)
-                # memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-                # st.session_state.rqa = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retriever, memory=memory,)
+                template = """次のコンテキスト情報をもとに、最後の質問に300字程度で答えてください。
+コンテキスト情報の中に回答に十分な情報がない場合は、十分な情報がないため分かりません、と答えてください。:
+Context: {context}
+
+Question: {question}"""
+                prompt = PromptTemplate.from_template(template)
+                st.session_state.rqa = {"context": retriever, "question": RunnablePassthrough()} | prompt | llm | StrOutputParser()
+
                 # bot message
                 firstMessage = f"PDF は {len(documents)} ページありました。質問をどうぞ。"
                 st.session_state.messages.append({"role": "assistant", "content": firstMessage})
@@ -61,19 +62,19 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # Accept user input
-if prompt := st.chat_input("日本語変換の確定でサブミットされるため、質問はペーストしてください。", disabled=("rqa" not in st.session_state)):
+if query := st.chat_input("日本語変換の確定でサブミットされるため、質問はペーストしてください。", disabled=("rqa" not in st.session_state)):
     # Display user message in chat message container
     with st.chat_message("user"):
-        st.markdown(prompt)
+        st.markdown(query)
 
     # RetrievalQA
     qa = st.session_state.rqa
-    response = qa({"query": prompt})  # "query" for RetrievalQA "question" for ConversationalRetrievalChain
+    response = qa.invoke(query)
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        st.markdown(response["result"])  # "result" for RetrievalQA "answer" for ConversationalRetrievalChain
+        st.markdown(response)
 
     # Add message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.session_state.messages.append({"role": "assistant", "content": response["result"]})
+    st.session_state.messages.append({"role": "user", "content": query})
+    st.session_state.messages.append({"role": "assistant", "content": response})
