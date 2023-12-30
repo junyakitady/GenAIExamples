@@ -13,7 +13,7 @@ from langchain.vectorstores import Chroma
 import vertexai
 
 # init Vertex AI
-PROJECT_ID = "<your_project_id>"
+PROJECT_ID = os.environ.get("PROJECT_ID")
 REGION = "us-central1"
 vertexai.init(project=PROJECT_ID, location=REGION)
 

@@ -1,3 +1,4 @@
+import os
 from operator import itemgetter
 import streamlit as st
 import langchain
@@ -9,9 +10,9 @@ from langchain.retrievers import GoogleVertexAISearchRetriever
 import vertexai
 
 # init Vertex AI
-PROJECT_ID = "<your_project_id>"
+PROJECT_ID = os.environ.get("PROJECT_ID")
 REGION = "us-central1"
-DATASTORE_ID = "<datastore_id>"
+DATASTORE_ID = os.environ.get("DATASTORE_ID")
 vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("Chat with Vertex AI Search")

@@ -8,18 +8,21 @@
   - Notebook は[こちら](./notebook/DocQA_VertexAISearch.ipynb)
 3. Gemini、PaLM Bison、PaLM Unicorn に同時のプロンプトを投げて比較
 
-以下のプロダクトを利用しています。
+このアプリケーションは以下のプロダクトを利用しています。
 - [Vertex AI PaLM API](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview)
 - [LangChain 🦜️🔗](https://python.langchain.com/docs/get_started/introduction.html)
 - [Streamlit](https://streamlit.io/)
 
-コード中の`PROJECT_ID`や`DATASTORE_ID`などの変数は各自環境の値で置き換えてください。
 
 ## ローカルでの実行
 ローカルで実行する場合は、Google Cloud の `Vertex AI ユーザー`権限を保持するサービスアカウントキーを作成し、キーファイルを保存しておきます。
-
 ```shell
 export GOOGLE_APPLICATION_CREDENTIALS="KEY_PATH"
+```
+環境変数に以下の値を設定してください。
+```shell
+export PROJECT_ID=<your_project_id>
+export DATASTORE_ID=<datastore_id>
 ```
 Python v3.8.1 以降が導入されていることを確認し、以下を実行します。 
 ```shell
@@ -34,5 +37,7 @@ Cloud Console の Cloud Run のサービス作成 UI を利用する場合、
 - ソースリポジトリからビルドタイプ Docker ファイルでビルド
 - 認証に未認証の呼び出しを許可
 - セキュリティのサービスアカウントに、`Vertex AI ユーザー`権限を保持するサービスアカウントを指定
+- 環境変数 PROJECT_ID=<your_project_id>
+- 環境変数 DATASTORE_ID=<datastore_id>
 
 を各自の環境用に指定すれば自動でデプロイ、動作します。

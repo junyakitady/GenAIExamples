@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import langchain
 from langchain.llms import VertexAI
@@ -5,7 +6,7 @@ import vertexai
 import asyncio
 
 # init Vertex AI
-PROJECT_ID = "<your_project_id>"
+PROJECT_ID = os.environ.get("PROJECT_ID")
 REGION = "us-central1"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
