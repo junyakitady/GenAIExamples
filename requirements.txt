@@ -6,3 +6,6 @@ chromadb
 google-cloud-aiplatform
 google-cloud-discoveryengine
 PyCryptodome
+langchain_experimental
+sqlalchemy-bigquery
+bigframes
