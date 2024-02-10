@@ -2,14 +2,14 @@ import tempfile
 import os
 import streamlit as st
 import langchain
-from langchain.document_loaders import PyPDFLoader
 from langchain.prompts import PromptTemplate
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain.llms import VertexAI
-from langchain.embeddings import VertexAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.vectorstores import Chroma
+from langchain_google_vertexai import VertexAI
+from langchain_google_vertexai import VertexAIEmbeddings
 import vertexai
 
 # init Vertex AI
@@ -41,10 +41,9 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # Expose index to the retriever
                 retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
                 # Text model instance integrated with LangChain
-                llm = VertexAI(model_name="text-bison", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
+                llm = VertexAI(model_name="gemini-pro", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
                 # Create chain to answer questions
-                template = """次のコンテキスト情報をもとに、最後の質問に300字程度で答えてください。
-コンテキスト情報の中に回答に十分な情報がない場合は、十分な情報がないため分かりません、と答えてください。:
+                template = """次のコンテキスト情報を利用して、最後の質問に答えてください。:
 Context: {context}
 
 Question: {question}"""

@@ -1,14 +1,13 @@
-from typing import Any
+from typing import Any, Union
 import os
 import streamlit as st
 import langchain
-from langchain.agents.agent import AgentExecutor
-from langchain.agents.mrkl.base import ZeroShotAgent
-from langchain.chains.llm import LLMChain
-from langchain_experimental.tools.python.tool import PythonAstREPLTool
-from langchain.llms import VertexAI
+from langchain.agents import create_react_agent
+from langchain.agents.agent import AgentExecutor, BaseSingleActionAgent, BaseMultiActionAgent, RunnableAgent
 from langchain.prompts import PromptTemplate
 from langchain.schema.language_model import BaseLanguageModel
+from langchain_experimental.tools.python.tool import PythonAstREPLTool
+from langchain_google_vertexai import VertexAI
 import vertexai
 import bigframes
 import bigframes.pandas as bpd
@@ -32,39 +31,40 @@ bdf = bpd.read_gbq(table)
 st.dataframe(bdf.head(5))
 
 with st.form('my_form'):
-    prompt = st.text_area(label='Prompt', value="""東京都杉並区の中で地価を高い順に5個教えてください。
+    prompt = st.text_area(label='Prompt', value="""住所が東京都杉並区の中で地価を高い順に5個教えてください。
 以下のフォーマットで表形式で回答してください。
 [最寄り駅] [住所] [地価]""")
     submitted = st.form_submit_button('Submit')
 
 # Text model instance integrated with LangChain
-llm = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0)
+llm = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0.1)
 
 AGENT_TEMPLATE = """
 You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
 You should use the tools below to answer the question posed of you:
 
-python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
+{tools}
 
 Use the following format:
 
 Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be "python_repl_ast"
-Action Input: the input to the action
+Thought: you should always check the Obervation and think about what to do next
+Action: the tool you should use is always "{tool_names}"
+Action Input: the pandas dataframe command
 Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 
 
-This is the result of `print(df.head())`:
+This is the result of `print(df.head())`, you should always use these keys for query. :
 {df_head}
-You can only use above columns for query.
+Do not use df.query() method.
 
 Begin!
 Question: {input}
 {agent_scratchpad}
+
 """
 
 
@@ -78,11 +78,19 @@ def hack_create_pandas_dataframe_agent(  # hack Langchain as bigframes.dataframe
     prompt = PromptTemplate(template=AGENT_TEMPLATE, input_variables=["input", "agent_scratchpad", "df_head"])
     partial_prompt = prompt.partial()
     partial_prompt = partial_prompt.partial(df_head=str(df.head(5).to_markdown()))
-    llm_chain = LLMChain(llm=llm, prompt=partial_prompt)
-    tool_names = [tool.name for tool in tools]
-    agent = ZeroShotAgent(llm_chain=llm_chain, allowed_tools=tool_names)
-    new_agent = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=verbose, return_intermediate_steps=verbose, max_iterations=5)
-    return new_agent
+    agent: Union[BaseSingleActionAgent, BaseMultiActionAgent] = RunnableAgent(
+        runnable=create_react_agent(llm, tools, partial_prompt),  # type: ignore
+        input_keys_arg=["input"],
+        return_keys_arg=["output"],
+    )
+    return AgentExecutor(
+        agent=agent,
+        tools=tools,
+        verbose=verbose,
+        return_intermediate_steps=verbose,
+        max_iterations=10,
+        early_stopping_method="force",
+    )
 
 
 # agent = create_pandas_dataframe_agent(llm, bdf, verbose=True)

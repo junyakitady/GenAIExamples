@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 import langchain
-from langchain.llms import VertexAI
+from langchain_google_vertexai import VertexAI
 import vertexai
 import asyncio
 

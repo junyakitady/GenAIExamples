@@ -1,11 +1,12 @@
 streamlit
 pypdf
 langchain
+langchain-community
+langchain-google-vertexai
 BeautifulSoup4
 chromadb
-google-cloud-aiplatform
 google-cloud-discoveryengine
 PyCryptodome
-langchain_experimental
+langchain-experimental
 sqlalchemy-bigquery
 bigframes

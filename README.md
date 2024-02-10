@@ -34,7 +34,7 @@ Python v3.8.1 以降が導入されていることを確認し、以下を実行
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-streamlit run ChatPDF.py
+streamlit run main.py
 ```
 ## Cloud Run での実行
 
