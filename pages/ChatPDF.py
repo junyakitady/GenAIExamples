@@ -14,7 +14,7 @@ import vertexai
 
 # init Vertex AI
 PROJECT_ID = os.environ.get("PROJECT_ID")
-REGION = "us-central1"
+REGION = "asia-northeast1"
 vertexai.init(project=PROJECT_ID, location=REGION)
 
 st.title("PDF の内容で回答する Chatbot")
@@ -32,7 +32,7 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # load PDF file
                 documents = PyPDFLoader(temp_pdf.name).load()
                 # Embeddings API integrated with LangChain
-                embedding = VertexAIEmbeddings(model_name="textembedding-gecko-multilingual")
+                embedding = VertexAIEmbeddings(model_name="textembedding-gecko-multilingual@latest")
                 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
                 content = "\n\n".join(doc.page_content for doc in documents)
                 texts = text_splitter.split_text(content)
@@ -41,9 +41,9 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # Expose index to the retriever
                 retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
                 # Text model instance integrated with LangChain
-                llm = VertexAI(model_name="gemini-pro", max_output_tokens=512, temperature=0.2, top_k=40, top_p=0.8, verbose=True)
+                llm = VertexAI(model_name="gemini-1.0-pro", max_output_tokens=2048, temperature=0.5, verbose=True)
                 # Create chain to answer questions
-                template = """次のコンテキスト情報を利用して、最後の質問に答えてください。:
+                template = """次のコンテキスト情報を利用して、最後の質問に答えてください。回答は300字程度で回答してください。:
 Context: {context}
 
 Question: {question}"""

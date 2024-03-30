@@ -5,7 +5,7 @@ import langchain
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_community.retrievers import GoogleVertexAISearchRetriever
+from langchain_google_community import VertexAISearchRetriever
 from langchain_google_vertexai import VertexAI
 import vertexai
 
@@ -24,12 +24,12 @@ if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
 
     # Text model instance integrated with LangChain
-    llm = VertexAI(model_name="gemini-pro", max_output_tokens=512, temperature=0.1, top_k=40, top_p=0.8, verbose=True)
+    llm = VertexAI(model_name="gemini-1.0-pro", max_output_tokens=2048, temperature=0.5, verbose=True)
     # Vertex AI Search retriever
-    retriever = GoogleVertexAISearchRetriever(project_id=PROJECT_ID, data_store_id=DATASTORE_ID,
-                                              get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)
+    retriever = VertexAISearchRetriever(project_id=PROJECT_ID, data_store_id=DATASTORE_ID,
+                                        get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)
     # Create chain to answer questions
-    template = """次のコンテキスト情報を利用して、最後の質問に答えてください。:
+    template = """次のコンテキスト情報を利用して、最後の質問に答えてください。回答は300字程度で回答してください。:
 Context: {context}
 
 Question: {question}"""

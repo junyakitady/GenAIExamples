@@ -1,8 +1,9 @@
 streamlit
 pypdf
 langchain
-langchain-community
+langchain-community 
 langchain-google-vertexai
+langchain-google-community
 BeautifulSoup4
 chromadb
 google-cloud-discoveryengine

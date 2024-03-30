@@ -14,7 +14,7 @@ import bigframes.pandas as bpd
 
 # init Vertex AI
 PROJECT_ID = os.environ.get("PROJECT_ID")
-REGION = "us-central1"
+REGION = "asia-northeast1"
 BQ_LOCATION = os.environ.get("BQ_LOCATION")
 BQ_DATASET = os.environ.get("BQ_DATASET")
 BQ_TABLE = os.environ.get("BQ_TABLE")
@@ -37,7 +37,7 @@ with st.form('my_form'):
     submitted = st.form_submit_button('Submit')
 
 # Text model instance integrated with LangChain
-llm = VertexAI(model_name="gemini-pro", max_output_tokens=1024, temperature=0.1)
+llm = VertexAI(model_name="gemini-1.0-pro", max_output_tokens=2048, temperature=0.5)
 
 AGENT_TEMPLATE = """
 You are working with a pandas dataframe in Python. The name of the dataframe is `df`.
