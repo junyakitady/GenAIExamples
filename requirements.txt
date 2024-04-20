@@ -11,3 +11,4 @@ PyCryptodome
 langchain-experimental
 sqlalchemy-bigquery
 bigframes
+anthropic[vertex]
