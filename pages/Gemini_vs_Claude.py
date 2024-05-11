@@ -14,9 +14,9 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 
 # layoout page
 st.set_page_config(layout="wide")
-st.title("Vertex AI の言語モデルを比較")
+st.title("Gemini vs Claude3")
 with st.form('my_form'):
-    uploaded_file = st.file_uploader("(option) PDF を入力する場合、Gemini は画像として、Anthropic はテキストとしてロードします。", type=["pdf"],)
+    uploaded_file = st.file_uploader("(option) PDF を入力する場合、Gemini は画像として、Claude はテキストとしてロードします。", type=["pdf"],)
     if uploaded_file:
         with st.spinner('Loading ...'):
             bytes_data = uploaded_file.getvalue()
@@ -35,7 +35,6 @@ with st.form('my_form'):
 col1, col2 = st.columns(2)
 col1.subheader('Gemini 1.5 Pro')
 col2.subheader('Claude 3 Opus')
-# output_tokens = st.sidebar.text_input('max_output_tokens', value=2048)
 
 
 async def ask_gemini15pro():
@@ -46,7 +45,6 @@ async def ask_gemini15pro():
     with col1:
         fulltext = ""
         message_placeholder = st.empty()
-        vertexai.init(project="llm20230620", location="asia-northeast1")
         model = GenerativeModel("gemini-1.5-pro-preview-0409")
         responses = await model.generate_content_async(data, generation_config={"max_output_tokens": 2048, "temperature": 1.0}, stream=True)
         async for response in responses:
@@ -62,7 +60,7 @@ async def ask_claude():
     with col2:
         fulltext = ""
         message_placeholder = st.empty()
-        # model="claude-3-sonnet@20240229",
+        client = AsyncAnthropicVertex(region="us-east5", project_id=PROJECT_ID)
         async with client.messages.stream(model="claude-3-opus@20240229", max_tokens=2048, messages=[{"role": "user", "content": data, }]) as stream:
             async for text in stream.text_stream:
                 fulltext += text
@@ -76,6 +74,5 @@ async def ask_llms():
     await asyncio.gather(*tasks)
 
 
-client = AsyncAnthropicVertex(region="us-east5", project_id=PROJECT_ID)  # us-central1 for Sonnet
 if submitted:
     asyncio.run(ask_llms())
