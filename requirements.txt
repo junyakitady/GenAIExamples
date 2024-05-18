@@ -1,7 +1,9 @@
 streamlit
 pypdf
 langchain
-langchain-community 
+langchain-community
+langchain-chroma
+langchain-text-splitters
 langchain-google-vertexai
 langchain-google-community
 BeautifulSoup4

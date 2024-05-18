@@ -3,11 +3,12 @@ import os
 import streamlit as st
 import langchain
 from langchain.prompts import PromptTemplate
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_vertexai import VertexAI
 from langchain_google_vertexai import VertexAIEmbeddings
 import vertexai
@@ -41,7 +42,7 @@ if uploaded_file and ("rqa" not in st.session_state):
                 # Expose index to the retriever
                 retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 3})
                 # Text model instance integrated with LangChain
-                llm = VertexAI(model_name="gemini-1.0-pro", max_output_tokens=2048, temperature=0.5, verbose=True)
+                llm = VertexAI(model_name="gemini-1.5-flash", max_output_tokens=2048, temperature=0.5, verbose=True)
                 # Create chain to answer questions
                 template = """次のコンテキスト情報を利用して、最後の質問に答えてください。回答は300字程度で回答してください。:
 Context: {context}

@@ -1,6 +1,7 @@
 import os
 from operator import itemgetter
 import streamlit as st
+import streamlit.components.v1 as components
 import langchain
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -18,13 +19,13 @@ vertexai.init(project=PROJECT_ID, location=REGION)
 st.title("Chat with Vertex AI Search")
 st.text("Vertex AI Search に登録済みの文書でチャットできます。ChatPDFのサンプルと同じPDFが登録されています。")
 with st.sidebar:
-    st.components.v1.iframe("https://storage.googleapis.com/public4llm/es/index.html", height=650)
+    components.iframe("https://storage.googleapis.com/public4llm/es/index.html", height=650)
 
 if "esmessages" not in st.session_state:
     st.session_state.esmessages = []
 
     # Text model instance integrated with LangChain
-    llm = VertexAI(model_name="gemini-1.0-pro", max_output_tokens=2048, temperature=0.5, verbose=True)
+    llm = VertexAI(model_name="gemini-1.5-flash", max_output_tokens=2048, temperature=0.5, verbose=True)
     # Vertex AI Search retriever
     retriever = VertexAISearchRetriever(project_id=PROJECT_ID, data_store_id=DATASTORE_ID,
                                         get_extractive_answers=True, max_extractive_answer_count=3, max_documents=3)

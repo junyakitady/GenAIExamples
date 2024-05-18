@@ -45,7 +45,7 @@ async def ask_gemini15pro():
     with col1:
         fulltext = ""
         message_placeholder = st.empty()
-        model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        model = GenerativeModel("gemini-1.5-pro")
         responses = await model.generate_content_async(data, generation_config={"max_output_tokens": 2048, "temperature": 1.0}, stream=True)
         async for response in responses:
             fulltext += response.text

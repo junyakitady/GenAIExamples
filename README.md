@@ -6,12 +6,12 @@
   - Notebook は[こちら](./notebook/DocQA_PaLM_LangChain.ipynb)
 2. Vertex AI Search にアップロード済みの PDFに対し、その内容に回答できるボット
   - Notebook は[こちら](./notebook/DocQA_VertexAISearch.ipynb)
-3. Gemini、PaLM Bison、PaLM Unicorn に同時のプロンプトを投げて比較
+3. Gemini、Claude 3 に同時のプロンプトを投げて比較
 4. BigQuery のテーブルに自然言語で問い合わせる
   - Notebook は[こちら](./notebook/AskBigQuery.ipynb)
 
 このアプリケーションは以下のプロダクトを利用しています。
-- [Vertex AI PaLM API](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/overview)
+- [Generative AI on Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/overview)
 - [LangChain 🦜️🔗](https://python.langchain.com/docs/get_started/introduction.html)
 - [Streamlit](https://streamlit.io/)
 
