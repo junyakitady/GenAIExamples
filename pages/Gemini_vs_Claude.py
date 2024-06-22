@@ -34,7 +34,7 @@ with st.form('my_form'):
 
 col1, col2 = st.columns(2)
 col1.subheader('Gemini 1.5 Pro')
-col2.subheader('Claude 3 Opus')
+col2.subheader('Claude 3.5 Sonnet')
 
 
 async def ask_gemini15pro():
@@ -61,7 +61,7 @@ async def ask_claude():
         fulltext = ""
         message_placeholder = st.empty()
         client = AsyncAnthropicVertex(region="us-east5", project_id=PROJECT_ID)
-        async with client.messages.stream(model="claude-3-opus@20240229", max_tokens=2048, messages=[{"role": "user", "content": data, }]) as stream:
+        async with client.messages.stream(model="claude-3-5-sonnet@20240620", max_tokens=2048, messages=[{"role": "user", "content": data, }]) as stream:
             async for text in stream.text_stream:
                 fulltext += text
                 message_placeholder.markdown(fulltext)
